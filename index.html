@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sorteio do Jantar</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+            text-align: center;
+        }
+
+        .container {
+            background-color: #fff;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        #resultado {
+            font-size: 2.5em;
+            color: #28a745;
+            font-weight: bold;
+            min-height: 50px;
+            margin-top: 20px;
+        }
+
+        button {
+            padding: 15px 30px;
+            font-size: 1.2em;
+            color: #fff;
+            background-color: #007bff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>O que vamos comer hoje?</h1>
+        <button onclick="sortear()">Sortear</button>
+        <div id="resultado"></div>
+    </div>
+
+    <script>
+        const opcoes = [
+            "Esfiha",
+            "Lanche",
+            "Comida Japonesa",
+            "Pizza",
+            "Espeto",
+            "Pastel",
+            "Batata Recheada"
+        ];
+
+        function sortear() {
+            // Gera um número aleatório entre 0 e o número de opções - 1
+            const indiceSorteado = Math.floor(Math.random() * opcoes.length);
+            
+            // Pega a opção correspondente ao índice sorteado
+            const opcaoSorteada = opcoes[indiceSorteado];
+            
+            // Exibe a opção sorteada na tela
+            document.getElementById("resultado").innerText = "Hoje vai ser:\n" + opcaoSorteada;
+        }
+    </script>
+</body>
+</html>

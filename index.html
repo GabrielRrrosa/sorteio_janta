@@ -3,8 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sorteio do Jantar - Roleta</title>
+    <title>Sorteio do Jantar - Roleta Mobile</title>
     <style>
+        /* Ajustes no corpo para ocupar 100% da viewport */
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             display: flex;
@@ -16,32 +17,36 @@
             text-align: center;
             color: #fff;
             overflow: hidden;
+            flex-direction: column; /* Coloca os elementos em coluna */
         }
 
+        /* Container principal para centralizar o conteúdo */
         .container {
-            background-color: rgba(255, 255, 255, 0.1);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
             padding: 20px;
-            border-radius: 15px;
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
-            width: 90%;
-            max-width: 500px;
             box-sizing: border-box;
+            width: 100%; /* Ocupa a largura total */
+            height: 100vh; /* Ocupa a altura total da tela */
         }
 
         h1 {
             color: #fff;
             margin-bottom: 25px;
-            font-size: 2.2em;
+            font-size: 2em; /* Tamanho da fonte ajustado para mobile */
         }
 
+        /* Ajustes na roleta para se adaptar a telas menores */
         #roleta-container {
             position: relative;
-            width: 250px;
-            height: 250px;
+            width: 80vmin; /* Usa a menor dimensão da viewport (altura ou largura) */
+            height: 80vmin;
             margin: 30px auto;
             border-radius: 50%;
             border: 8px solid #f8d42d;
-            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
             overflow: hidden;
             display: flex;
             justify-content: center;
@@ -57,7 +62,7 @@
             justify-content: center;
             align-items: center;
             transition: transform 6s cubic-bezier(0.17, 0.82, 0.44, 1);
-            transform: rotate(0deg); /* Estado inicial para a transição */
+            transform: rotate(0deg);
         }
 
         .fatia {
@@ -99,7 +104,7 @@
         }
 
         #resultado {
-            font-size: 2.5em;
+            font-size: 2.2em; /* Tamanho da fonte ajustado para mobile */
             color: #f8d42d;
             font-weight: bold;
             min-height: 50px;
@@ -118,6 +123,7 @@
             opacity: 1;
         }
 
+        /* Botão ocupando a largura total */
         button {
             padding: 15px 30px;
             font-size: 1.3em;
@@ -128,7 +134,7 @@
             cursor: pointer;
             transition: background-color 0.3s ease, transform 0.2s ease;
             margin-top: 20px;
-            width: 100%;
+            width: 90%; /* Ocupa 90% da largura em mobile */
             max-width: 300px;
         }
 
@@ -142,15 +148,16 @@
             cursor: not-allowed;
         }
 
-        @media (max-width: 600px) {
+        /* Media queries para telas ainda menores */
+        @media (max-width: 400px) {
             h1 {
                 font-size: 1.8em;
             }
             #resultado {
-                font-size: 2em;
+                font-size: 1.8em;
             }
-            .container {
-                padding: 15px;
+            .fatia span {
+                transform: rotate(90deg) translateX(40px);
             }
         }
     </style>
@@ -167,7 +174,7 @@
     </div>
 
     <script>
-        const opcoes = [
+      const opcoes = [
             "Esfiha",
             "Lanche",
             "Comida Japonesa",
@@ -206,21 +213,17 @@
             botaoSortear.disabled = true;
             resultadoElement.classList.remove("show");
             
-            // Re-define o estado inicial para permitir uma nova transição
             roletaElement.style.transition = 'none';
             roletaElement.style.transform = `rotate(0deg)`;
 
-            // Força o navegador a recalcular o layout para que a transição funcione
             roletaElement.offsetHeight; 
 
-            // Gera o ângulo de sorteio
             const indiceSorteado = Math.floor(Math.random() * numFatias);
             const opcaoSorteada = opcoes[indiceSorteado];
             const anguloTarget = 360 - (indiceSorteado * anguloFatia + anguloFatia / 2);
             const voltas = 5;
             const anguloGiroFinal = anguloTarget + (voltas * 360);
 
-            // Aplica a transição e a rotação
             roletaElement.style.transition = 'transform 6s cubic-bezier(0.17, 0.82, 0.44, 1)';
             roletaElement.style.transform = `rotate(${anguloGiroFinal}deg)`;
 

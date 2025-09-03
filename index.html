@@ -3,60 +3,167 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sorteio do Jantar</title>
+    <title>Sorteio do Jantar - Roleta</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
+            min-height: 100vh;
             margin: 0;
-            background-color: #f0f0f0;
+            background: linear-gradient(to right, #6dd5ed, #2193b0);
             text-align: center;
+            color: #fff;
+            overflow: hidden;
         }
 
         .container {
-            background-color: #fff;
-            padding: 40px;
-            border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            background-color: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+            width: 90%;
+            max-width: 500px;
+            box-sizing: border-box;
         }
 
         h1 {
+            color: #fff;
+            margin-bottom: 25px;
+            font-size: 2.2em;
+        }
+
+        #roleta-container {
+            position: relative;
+            width: 250px;
+            height: 250px;
+            margin: 30px auto;
+            border-radius: 50%;
+            border: 8px solid #f8d42d;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #f1f1f1;
+        }
+
+        #roleta {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: transform 6s cubic-bezier(0.17, 0.82, 0.44, 1);
+            transform: rotate(0deg); /* Estado inicial para a transição */
+        }
+
+        .fatia {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            clip-path: polygon(50% 50%, 95% 0%, 95% 100%);
+            transform-origin: 50% 50%;
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            padding-right: 20px;
+            box-sizing: border-box;
             color: #333;
-            margin-bottom: 20px;
+            font-weight: bold;
+            font-size: 0.9em;
+            text-align: right;
+            white-space: nowrap;
+            overflow: hidden;
+            border: 1px solid rgba(0,0,0,0.1);
+        }
+
+        .fatia span {
+            transform: rotate(90deg) translateX(50px);
+            display: block;
+        }
+
+        #ponteiro {
+            position: absolute;
+            top: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 15px solid transparent;
+            border-right: 15px solid transparent;
+            border-bottom: 30px solid #e74c3c;
+            z-index: 10;
         }
 
         #resultado {
             font-size: 2.5em;
-            color: #28a745;
+            color: #f8d42d;
             font-weight: bold;
             min-height: 50px;
-            margin-top: 20px;
+            margin-top: 30px;
+            background-color: rgba(0, 0, 0, 0.3);
+            padding: 10px;
+            border-radius: 8px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+
+        #resultado.show {
+            opacity: 1;
         }
 
         button {
             padding: 15px 30px;
-            font-size: 1.2em;
+            font-size: 1.3em;
             color: #fff;
-            background-color: #007bff;
+            background-color: #28a745;
             border: none;
-            border-radius: 5px;
+            border-radius: 8px;
             cursor: pointer;
-            transition: background-color 0.3s ease;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            margin-top: 20px;
+            width: 100%;
+            max-width: 300px;
         }
 
         button:hover {
-            background-color: #0056b3;
+            background-color: #218838;
+            transform: translateY(-2px);
+        }
+
+        button:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+
+        @media (max-width: 600px) {
+            h1 {
+                font-size: 1.8em;
+            }
+            #resultado {
+                font-size: 2em;
+            }
+            .container {
+                padding: 15px;
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>O que vamos comer hoje?</h1>
-        <button onclick="sortear()">Sortear</button>
+        <div id="roleta-container">
+            <div id="roleta"></div>
+            <div id="ponteiro"></div>
+        </div>
         <div id="resultado"></div>
+        <button id="botaoSortear" onclick="iniciarSorteio()">Sortear</button>
     </div>
 
     <script>
@@ -64,25 +171,66 @@
             "Esfiha",
             "Lanche",
             "Comida Japonesa",
-            "Pizza",
+            "Pizza rodízio",
+            "Pizza delivery",
+            "Pizza mercado",
             "Espeto",
             "Pastel",
-            "Batata Recheada",
+            "Batata Recheada Delivery",
+            "Batata Recheada no local",
             "Porções"
         ];
 
-        function sortear() {
-            // Gera um número aleatório entre 0 e o número de opções - 1
-            const indiceSorteado = Math.floor(Math.random() * opcoes.length);
+        const roletaElement = document.getElementById("roleta");
+        const resultadoElement = document.getElementById("resultado");
+        const botaoSortear = document.getElementById("botaoSortear");
+        const numFatias = opcoes.length;
+        const anguloFatia = 360 / numFatias;
+
+        function gerarFatiasRoleta() {
+            roletaElement.innerHTML = '';
+            opcoes.forEach((opcao, index) => {
+                const fatia = document.createElement("div");
+                fatia.classList.add("fatia");
+                const hue = (index * (360 / numFatias) + 60) % 360;
+                fatia.style.backgroundColor = `hsl(${hue}, 70%, 85%)`;
+                fatia.style.transform = `rotate(${index * anguloFatia}deg)`;
+                fatia.innerHTML = `<span>${opcao}</span>`;
+                roletaElement.appendChild(fatia);
+            });
+        }
+
+        gerarFatiasRoleta();
+
+        function iniciarSorteio() {
+            botaoSortear.disabled = true;
+            resultadoElement.classList.remove("show");
             
-            // Pega a opção correspondente ao índice sorteado
+            // Re-define o estado inicial para permitir uma nova transição
+            roletaElement.style.transition = 'none';
+            roletaElement.style.transform = `rotate(0deg)`;
+
+            // Força o navegador a recalcular o layout para que a transição funcione
+            roletaElement.offsetHeight; 
+
+            // Gera o ângulo de sorteio
+            const indiceSorteado = Math.floor(Math.random() * numFatias);
             const opcaoSorteada = opcoes[indiceSorteado];
-            
-            // Exibe a opção sorteada na tela
-            document.getElementById("resultado").innerText = "Hoje vai ser:\n" + opcaoSorteada;
+            const anguloTarget = 360 - (indiceSorteado * anguloFatia + anguloFatia / 2);
+            const voltas = 5;
+            const anguloGiroFinal = anguloTarget + (voltas * 360);
+
+            // Aplica a transição e a rotação
+            roletaElement.style.transition = 'transform 6s cubic-bezier(0.17, 0.82, 0.44, 1)';
+            roletaElement.style.transform = `rotate(${anguloGiroFinal}deg)`;
+
+            roletaElement.addEventListener('transitionend', function onTransitionEnd() {
+                roletaElement.removeEventListener('transitionend', onTransitionEnd);
+                resultadoElement.innerText = `Hoje vai ser:\n${opcaoSorteada}!`;
+                resultadoElement.classList.add("show");
+                botaoSortear.disabled = false;
+            });
         }
     </script>
 </body>
-
 </html>
-

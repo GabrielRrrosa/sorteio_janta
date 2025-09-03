@@ -3,9 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sorteio do Jantar - Roleta Mobile</title>
+    <title>Sorteio do Jantar - Roleta Perfeita</title>
     <style>
-        /* Ajustes no corpo para ocupar 100% da viewport */
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             display: flex;
@@ -17,10 +16,9 @@
             text-align: center;
             color: #fff;
             overflow: hidden;
-            flex-direction: column; /* Coloca os elementos em coluna */
+            flex-direction: column;
         }
 
-        /* Container principal para centralizar o conteúdo */
         .container {
             display: flex;
             flex-direction: column;
@@ -28,20 +26,19 @@
             align-items: center;
             padding: 20px;
             box-sizing: border-box;
-            width: 100%; /* Ocupa a largura total */
-            height: 100vh; /* Ocupa a altura total da tela */
+            width: 100%;
+            height: 100vh;
         }
 
         h1 {
             color: #fff;
             margin-bottom: 25px;
-            font-size: 2em; /* Tamanho da fonte ajustado para mobile */
+            font-size: 2em;
         }
 
-        /* Ajustes na roleta para se adaptar a telas menores */
         #roleta-container {
             position: relative;
-            width: 80vmin; /* Usa a menor dimensão da viewport (altura ou largura) */
+            width: 80vmin;
             height: 80vmin;
             margin: 30px auto;
             border-radius: 50%;
@@ -51,50 +48,56 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            background-color: #f1f1f1;
         }
 
         #roleta {
             position: absolute;
             width: 100%;
             height: 100%;
+            border-radius: 50%;
+            transition: transform 6s cubic-bezier(0.17, 0.82, 0.44, 1);
+            transform: rotate(0deg);
+            background-image: conic-gradient(
+                #ffadad 0% 9.09%, #ffd6a5 9.09% 18.18%, #fdffb6 18.18% 27.27%, #caffbf 27.27% 36.36%,
+                #9bf6ff 36.36% 45.45%, #a0c4ff 45.45% 54.54%, #bdb2ff 54.54% 63.63%, #ffc6ff 63.63% 72.72%,
+                #a2d2ff 72.72% 81.81%, #ffb8b8 81.81% 90.9%, #ffd4d4 90.9% 100%
+            );
+        }
+        
+        .item-roleta {
+            position: absolute;
+            width: 100%;
+            height: 50%;
+            top: 0;
+            left: 0;
+            transform-origin: 50% 100%;
             display: flex;
             justify-content: center;
             align-items: center;
-            transition: transform 6s cubic-bezier(0.17, 0.82, 0.44, 1);
-            transform: rotate(0deg);
-        }
-
-        .fatia {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            clip-path: polygon(50% 50%, 95% 0%, 95% 100%);
-            transform-origin: 50% 50%;
-            display: flex;
-            justify-content: flex-end;
-            align-items: center;
-            padding-right: 20px;
-            box-sizing: border-box;
             color: #333;
             font-weight: bold;
-            font-size: 0.9em;
-            text-align: right;
-            white-space: nowrap;
-            overflow: hidden;
-            border: 1px solid rgba(0,0,0,0.1);
         }
 
-        .fatia span {
-            transform: rotate(90deg) translateX(50px);
-            display: block;
-        }
-
-        #ponteiro {
+        .item-roleta span {
             position: absolute;
-            top: -20px;
+            bottom: 40px; /* Ajuste para centralizar o conteúdo */
+            font-size: 1.2em;
+            transform: translateY(-50%) rotate(90deg);
+            width: 100%;
+            text-align: center;
+            line-height: 1.2; /* Espaçamento entre as linhas do texto */
+        }
+        
+        .item-roleta .emoji {
+            font-size: 2em;
+        }
+        
+        /* Marcador de seleção fixo */
+        #marcador {
+            position: absolute;
+            top: 0;
             left: 50%;
-            transform: translateX(-50%);
+            transform: translateX(-50%) translateY(-100%);
             width: 0;
             height: 0;
             border-left: 15px solid transparent;
@@ -104,7 +107,7 @@
         }
 
         #resultado {
-            font-size: 2.2em; /* Tamanho da fonte ajustado para mobile */
+            font-size: 2.2em;
             color: #f8d42d;
             font-weight: bold;
             min-height: 50px;
@@ -123,7 +126,6 @@
             opacity: 1;
         }
 
-        /* Botão ocupando a largura total */
         button {
             padding: 15px 30px;
             font-size: 1.3em;
@@ -134,7 +136,7 @@
             cursor: pointer;
             transition: background-color 0.3s ease, transform 0.2s ease;
             margin-top: 20px;
-            width: 90%; /* Ocupa 90% da largura em mobile */
+            width: 90%;
             max-width: 300px;
         }
 
@@ -147,8 +149,7 @@
             background-color: #cccccc;
             cursor: not-allowed;
         }
-
-        /* Media queries para telas ainda menores */
+        
         @media (max-width: 400px) {
             h1 {
                 font-size: 1.8em;
@@ -156,8 +157,8 @@
             #resultado {
                 font-size: 1.8em;
             }
-            .fatia span {
-                transform: rotate(90deg) translateX(40px);
+            .item-roleta span {
+                font-size: 1em;
             }
         }
     </style>
@@ -167,25 +168,24 @@
         <h1>O que vamos comer hoje?</h1>
         <div id="roleta-container">
             <div id="roleta"></div>
-            <div id="ponteiro"></div>
-        </div>
+            <div id="marcador"></div> </div>
         <div id="resultado"></div>
         <button id="botaoSortear" onclick="iniciarSorteio()">Sortear</button>
     </div>
 
     <script>
       const opcoes = [
-            "Esfiha",
-            "Lanche",
-            "Comida Japonesa",
-            "Pizza rodízio",
-            "Pizza delivery",
-            "Pizza mercado",
-            "Espeto",
-            "Pastel",
-            "Batata Recheada Delivery",
-            "Batata Recheada no local",
-            "Porções"
+            { nome: "Esfiha", emoji: "👳🏻‍♂️" },
+            { nome: "Lanche", emoji: "🍔" },
+            { nome: "Comida Japonesa", emoji: "🍣" },
+            { nome: "Pizza rodízio", emoji: "🍕" },
+            { nome: "Pizza delivery", emoji: "🛵" },
+            { nome: "Pizza mercado", emoji: "🛒" },
+            { nome: "Espeto", emoji: "🍢" },
+            { nome: "Pastel", emoji: "🥟" },
+            { nome: "Batata Recheada Delivery", emoji: "🛵" },
+            { nome: "Batata Recheada no local", emoji: "🥔" },
+            { nome: "Porções", emoji: "🍟" }
         ];
 
         const roletaElement = document.getElementById("roleta");
@@ -194,20 +194,23 @@
         const numFatias = opcoes.length;
         const anguloFatia = 360 / numFatias;
 
-        function gerarFatiasRoleta() {
+        function gerarItemsRoleta() {
             roletaElement.innerHTML = '';
             opcoes.forEach((opcao, index) => {
-                const fatia = document.createElement("div");
-                fatia.classList.add("fatia");
-                const hue = (index * (360 / numFatias) + 60) % 360;
-                fatia.style.backgroundColor = `hsl(${hue}, 70%, 85%)`;
-                fatia.style.transform = `rotate(${index * anguloFatia}deg)`;
-                fatia.innerHTML = `<span>${opcao}</span>`;
-                roletaElement.appendChild(fatia);
+                const item = document.createElement("div");
+                item.classList.add("item-roleta");
+                
+                const rotacaoItem = index * anguloFatia;
+                item.style.transform = `rotate(${rotacaoItem}deg)`;
+
+                const conteudoHTML = `<span><span class="emoji">${opcao.emoji}</span><br>${opcao.nome}</span>`;
+                item.innerHTML = conteudoHTML;
+                
+                roletaElement.appendChild(item);
             });
         }
 
-        gerarFatiasRoleta();
+        gerarItemsRoleta();
 
         function iniciarSorteio() {
             botaoSortear.disabled = true;
@@ -220,8 +223,11 @@
 
             const indiceSorteado = Math.floor(Math.random() * numFatias);
             const opcaoSorteada = opcoes[indiceSorteado];
-            const anguloTarget = 360 - (indiceSorteado * anguloFatia + anguloFatia / 2);
-            const voltas = 5;
+            
+            // O ângulo de parada é o meio da fatia, para o marcador
+            const anguloTarget = -(indiceSorteado * anguloFatia + anguloFatia / 2);
+            
+            const voltas = 10;
             const anguloGiroFinal = anguloTarget + (voltas * 360);
 
             roletaElement.style.transition = 'transform 6s cubic-bezier(0.17, 0.82, 0.44, 1)';
@@ -229,7 +235,7 @@
 
             roletaElement.addEventListener('transitionend', function onTransitionEnd() {
                 roletaElement.removeEventListener('transitionend', onTransitionEnd);
-                resultadoElement.innerText = `Hoje vai ser:\n${opcaoSorteada}!`;
+                resultadoElement.innerText = `Hoje vai ser:\n${opcaoSorteada.emoji} ${opcaoSorteada.nome}!`;
                 resultadoElement.classList.add("show");
                 botaoSortear.disabled = false;
             });
